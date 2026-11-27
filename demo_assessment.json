@@ -1,0 +1,144 @@
+{
+  "release_id": "REL-2026-041",
+  "release_name": "Orders incremental ingestion and MERGE update",
+  "total_score": 80,
+  "risk_band": "Critical",
+  "dimensions": [
+    {
+      "key": "historical_similarity",
+      "label": "Historical incident similarity",
+      "score": 24.7,
+      "max_score": 30,
+      "explanation": "Higher scores mean this release resembles changes associated with previous incidents.",
+      "evidence": [
+        "INC-1042: Chroma cosine similarity 0.722, structured overlap 97.5%, severity sev1 (weight 1.00) → historical signal 82.3%",
+        "INC-1018: Chroma cosine similarity 0.641, structured overlap 58.3%, severity sev2 (weight 0.90) → historical signal 55.6%",
+        "INC-0898: Chroma cosine similarity 0.507, structured overlap 10.8%, severity sev2 (weight 0.90) → historical signal 31.3%"
+      ]
+    },
+    {
+      "key": "change_sensitivity",
+      "label": "Change sensitivity",
+      "score": 20.0,
+      "max_score": 20,
+      "explanation": "Higher scores mean the release touches more failure-sensitive change types.",
+      "evidence": [
+        "watermark_change: +7 — Watermark changes can skip or reprocess records.",
+        "merge_logic: +7 — MERGE-condition changes can introduce duplicates or missed updates.",
+        "schema_change: +6 — Schema changes can break downstream consumers."
+      ]
+    },
+    {
+      "key": "blast_radius",
+      "label": "Impact and blast radius",
+      "score": 16,
+      "max_score": 20,
+      "explanation": "Higher scores mean a more critical service or a wider downstream impact.",
+      "evidence": [
+        "Service criticality 'high': +8",
+        "3 downstream dependencies: +6",
+        "3 changed components: +2",
+        "Downstream: orders_gold_model, finance_reporting, customer_360"
+      ]
+    },
+    {
+      "key": "operational_health",
+      "label": "Operational signals",
+      "score": 11.4,
+      "max_score": 15,
+      "explanation": "Higher scores mean supplied telemetry is unhealthy; missing telemetry receives a neutral risk assumption.",
+      "evidence": [
+        "error_rate_pct: 2.4; contributes 4/5 risk points",
+        "latency_p95_ms: 2800; contributes 3/4 risk points",
+        "pipeline_lag_minutes: 45; contributes 3/4 risk points",
+        "cpu_utilization_pct: 92; contributes 3/4 risk points",
+        "memory_utilization_pct: 86; contributes 3/4 risk points",
+        "job_failure_rate_pct: 3.1; contributes 3/4 risk points",
+        "data_freshness_lag_minutes: 48; contributes 3/4 risk points"
+      ]
+    },
+    {
+      "key": "release_readiness",
+      "label": "Release readiness",
+      "score": 8.0,
+      "max_score": 15,
+      "explanation": "Higher scores mean tests, rollback, canary or approval readiness is incomplete.",
+      "evidence": [
+        "Test status 'partial': +4",
+        "Rollback has not been tested: +3",
+        "Canary deployment disabled: +1",
+        "Required approvals complete: +0"
+      ]
+    }
+  ],
+  "matched_incidents": [
+    {
+      "incident_id": "INC-1042",
+      "title": "Orders ingestion skipped late-arriving records",
+      "service": "orders_ingestion",
+      "similarity_pct": 97.5,
+      "severity": "sev1",
+      "root_cause": "The incremental watermark advanced before late-arriving source records were committed, while the MERGE key did not enforce source uniqueness.",
+      "impact": "Orders were missing from downstream reporting and a subset of records was duplicated.",
+      "prevention": [
+        "Test late-arriving records at watermark boundaries",
+        "Assert source-key uniqueness before MERGE",
+        "Validate replay and backfill behaviour"
+      ],
+      "semantic_similarity": 0.722,
+      "historical_signal_pct": 82.32,
+      "severity_weight": 1.0
+    },
+    {
+      "incident_id": "INC-1018",
+      "title": "Duplicate order rows after merge-key update",
+      "service": "orders_ingestion",
+      "similarity_pct": 58.3,
+      "severity": "sev2",
+      "root_cause": "A nullable business key caused multiple source rows to match the same target record during an incremental MERGE.",
+      "impact": "Order counts were overstated in the analytics layer for two reporting cycles.",
+      "prevention": [
+        "Reject or quarantine null merge keys",
+        "Test repeated execution for idempotency",
+        "Check source uniqueness at the target grain"
+      ],
+      "semantic_similarity": 0.641,
+      "historical_signal_pct": 55.602000000000004,
+      "severity_weight": 0.9
+    },
+    {
+      "incident_id": "INC-0898",
+      "title": "Warehouse merge caused lock contention",
+      "service": "finance_warehouse",
+      "similarity_pct": 10.8,
+      "severity": "sev2",
+      "root_cause": "A broader MERGE predicate scanned and locked a much larger target range than expected.",
+      "impact": "Several downstream finance jobs missed their processing window.",
+      "prevention": [
+        "Review query plans for MERGE changes",
+        "Test representative production volumes",
+        "Monitor lock waits and job duration"
+      ],
+      "semantic_similarity": 0.507,
+      "historical_signal_pct": 31.265999999999995,
+      "severity_weight": 0.9
+    }
+  ],
+  "evidence_coverage_pct": 100,
+  "available_operational_signals": 7,
+  "total_operational_signals": 7,
+  "recommendations": [
+    "Test watermark boundaries, late-arriving records, replay behaviour and backfill safety.",
+    "Validate MERGE keys, source uniqueness, idempotency and duplicate/missing-row scenarios.",
+    "Run backward-compatibility checks against downstream consumers before deployment.",
+    "Test and document the rollback procedure before approving the release.",
+    "Use a canary or staged rollout and define an explicit observation window.",
+    "Complete the relevant automated regression and data-quality tests before deployment.",
+    "Review INC-1042 (Orders ingestion skipped late-arriving records) and verify its documented prevention steps."
+  ],
+  "caveats": [
+    "Risk index is a prioritization score, not a probability that an incident will occur.",
+    "Weights and thresholds are illustrative and must be calibrated against real release outcomes.",
+    "Historical-risk heuristic uses retrieved incidents only: 60% Chroma semantic relevance, 40% structured field overlap, adjusted by historical incident severity. These weights are illustrative."
+  ]
+}

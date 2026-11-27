@@ -1,0 +1,20 @@
+[
+  {
+    "release_id": "REL-2026-041",
+    "expected_incident_ids": ["INC-1042"],
+    "expected_runbook_ids": ["RB-ORD-01"],
+    "purpose": "Positive control: orders watermark, MERGE and late-arriving-record scenario"
+  },
+  {
+    "release_id": "REL-2026-043",
+    "expected_incident_ids": ["INC-0972"],
+    "expected_runbook_ids": ["RB-PAY-02"],
+    "purpose": "Positive control: payment credential/token-refresh scenario"
+  },
+  {
+    "release_id": "REL-2026-042",
+    "expected_incident_ids": [],
+    "expected_runbook_ids": [],
+    "purpose": "Negative control: documentation-only release; inspect whether retrieval returns distracting results"
+  }
+]

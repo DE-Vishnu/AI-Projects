@@ -1,0 +1,13 @@
+# Local persistent vector database and embedding orchestration.
+chromadb>=1.1.13,<2.0.0
+# YAML front matter for Markdown runbooks.
+PyYAML>=6.0.0
+# Explicit workflow orchestration for the end-to-end assessment.
+langgraph>=1.0,<2.0
+# Interactive prototype dashboard.
+streamlit>=1.40,<2.0
+# Read local .env configuration without committing API keys.
+python-dotenv>=1.0,<2.0
+
+# Compatibility pin for managed Windows devices where newer cygrpc DLLs may be blocked.
+grpcio==1.85.1

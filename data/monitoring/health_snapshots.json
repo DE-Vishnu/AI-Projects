@@ -1,0 +1,44 @@
+[
+  {
+    "service": "orders_ingestion",
+    "captured_at": "2026-11-26T09:30:00+05:30",
+    "source": "mock_new_relic_adapter",
+    "metrics": {
+      "error_rate_pct": 0.4,
+      "latency_p95_ms": 840,
+      "cpu_utilization_pct": 61,
+      "memory_utilization_pct": 68,
+      "pipeline_lag_minutes": 4,
+      "job_failure_rate_pct": 0.2,
+      "data_freshness_lag_minutes": 5
+    }
+  },
+  {
+    "service": "orders_ingestion",
+    "captured_at": "2026-11-26T10:30:00+05:30",
+    "source": "mock_new_relic_adapter",
+    "metrics": {
+      "error_rate_pct": 2.4,
+      "latency_p95_ms": 2800,
+      "cpu_utilization_pct": 92,
+      "memory_utilization_pct": 86,
+      "pipeline_lag_minutes": 45,
+      "job_failure_rate_pct": 3.1,
+      "data_freshness_lag_minutes": 48
+    }
+  },
+  {
+    "service": "payments_api",
+    "captured_at": "2026-11-26T10:25:00+05:30",
+    "source": "mock_datadog_adapter",
+    "metrics": {
+      "error_rate_pct": 0.8,
+      "latency_p95_ms": 950,
+      "cpu_utilization_pct": 71,
+      "memory_utilization_pct": 72,
+      "pipeline_lag_minutes": null,
+      "job_failure_rate_pct": null,
+      "data_freshness_lag_minutes": null
+    }
+  }
+]

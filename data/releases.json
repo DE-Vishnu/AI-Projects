@@ -1,0 +1,71 @@
+[
+  {
+    "release_id": "REL-2026-041",
+    "name": "Orders incremental ingestion and MERGE update",
+    "service": "orders_ingestion",
+    "description": "Changes the incremental watermark and MERGE condition in the orders pipeline. The update changes how late arriving records are selected and how duplicate source rows are handled.",
+    "change_types": ["watermark_change", "merge_logic", "schema_change"],
+    "changed_components": ["incremental_loader", "orders_silver_merge", "orders_bronze_schema"],
+    "downstream_dependencies": ["orders_gold_model", "finance_reporting", "customer_360"],
+    "criticality": "high",
+    "test_status": "partial",
+    "rollback_tested": false,
+    "canary_enabled": false,
+    "approvals_complete": true,
+    "operational_signals": {
+      "error_rate_pct": 2.4,
+      "latency_p95_ms": 2800,
+      "pipeline_lag_minutes": 45,
+      "cpu_utilization_pct": 92,
+      "memory_utilization_pct": 86,
+      "job_failure_rate_pct": 3.1,
+      "data_freshness_lag_minutes": 48
+    }
+  },
+  {
+    "release_id": "REL-2026-042",
+    "name": "Notification preferences documentation update",
+    "service": "notification_preferences",
+    "description": "Updates internal documentation and examples for notification preference configuration. No runtime code or API behaviour changes.",
+    "change_types": ["documentation_only"],
+    "changed_components": ["notification_preferences_readme"],
+    "downstream_dependencies": [],
+    "criticality": "low",
+    "test_status": "passed",
+    "rollback_tested": true,
+    "canary_enabled": true,
+    "approvals_complete": true,
+    "operational_signals": {
+      "error_rate_pct": 0.2,
+      "latency_p95_ms": 320,
+      "pipeline_lag_minutes": 2,
+      "cpu_utilization_pct": 38,
+      "memory_utilization_pct": 42,
+      "job_failure_rate_pct": 0.0,
+      "data_freshness_lag_minutes": 2
+    }
+  },
+  {
+    "release_id": "REL-2026-043",
+    "name": "Payment gateway dependency upgrade",
+    "service": "payments_api",
+    "description": "Upgrades the payment gateway client library and adjusts token refresh configuration for payment authorization requests.",
+    "change_types": ["dependency_upgrade", "authentication_change", "configuration_change"],
+    "changed_components": ["payment_gateway_client", "secrets_provider"],
+    "downstream_dependencies": ["checkout_api", "order_confirmation"],
+    "criticality": "critical",
+    "test_status": "passed",
+    "rollback_tested": true,
+    "canary_enabled": true,
+    "approvals_complete": true,
+    "operational_signals": {
+      "error_rate_pct": 0.8,
+      "latency_p95_ms": 950,
+      "pipeline_lag_minutes": 6,
+      "cpu_utilization_pct": 71,
+      "memory_utilization_pct": 72,
+      "job_failure_rate_pct": 0.2,
+      "data_freshness_lag_minutes": null
+    }
+  }
+]

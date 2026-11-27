@@ -1,0 +1,47 @@
+[
+  {
+    "runbook_id": "RB-ORD-01",
+    "title": "Orders incremental ingestion recovery",
+    "service": "orders_ingestion",
+    "triggers": ["watermark_change", "late_arriving_records", "pipeline_lag", "missing_orders"],
+    "checks": ["Validate watermark lower and upper boundaries", "Check source-key uniqueness before MERGE", "Compare source and target counts for the replay window"],
+    "rollback_steps": ["Pause the affected ingestion job", "Restore the previous watermark configuration", "Replay the bounded time window after deduplication"],
+    "rollback_triggers": ["Missing-record count exceeds agreed tolerance", "Duplicate-key count rises above baseline", "Pipeline lag exceeds the service SLO"]
+  },
+  {
+    "runbook_id": "RB-PAY-02",
+    "title": "Payment gateway credential rotation",
+    "service": "payments_api",
+    "triggers": ["authentication_change", "token_refresh", "authorization_error"],
+    "checks": ["Verify token refresh on all worker pools", "Validate secret version and expiry", "Run a synthetic authorization transaction"],
+    "rollback_steps": ["Restore previous secret version", "Restart workers with stale credentials", "Verify authorization success rate"],
+    "rollback_triggers": ["Authorization failures breach the error budget", "Token refresh failures persist after retry"]
+  },
+  {
+    "runbook_id": "RB-SCHEMA-03",
+    "title": "Schema and API contract compatibility",
+    "service": "customer_profile_api",
+    "triggers": ["schema_change", "api_contract_change", "consumer_failure"],
+    "checks": ["Run consumer-driven contract tests", "Validate nullable and required fields", "Confirm downstream consumer adoption"],
+    "rollback_steps": ["Restore the previous response contract", "Enable compatibility mapping", "Replay failed events where applicable"],
+    "rollback_triggers": ["Consumer rejection rate increases", "Dead-letter queue depth crosses threshold"]
+  },
+  {
+    "runbook_id": "RB-SPARK-04",
+    "title": "Spark workload memory and shuffle troubleshooting",
+    "service": "customer_360_pipeline",
+    "triggers": ["oom", "memory_pressure", "shuffle_spill", "partition_change"],
+    "checks": ["Inspect skew and shuffle partition sizes", "Compare executor memory and spill to baseline", "Run representative-volume performance tests"],
+    "rollback_steps": ["Restore previous partition configuration", "Revert risky join or repartition changes", "Rerun the failed bounded workload"],
+    "rollback_triggers": ["Executor OOM repeats", "Spill or runtime exceeds agreed baseline"]
+  },
+  {
+    "runbook_id": "RB-API-05",
+    "title": "Export API rate-limit recovery",
+    "service": "saas_export_connector",
+    "triggers": ["429", "rate_limit", "retry", "connector_lag"],
+    "checks": ["Verify Retry-After handling", "Check exponential backoff and jitter", "Inspect quota consumption and backlog"],
+    "rollback_steps": ["Restore the previous bounded polling rate", "Pause non-critical export jobs", "Resume in controlled batches"],
+    "rollback_triggers": ["Repeated 429 responses", "Connector lag breaches freshness SLO"]
+  }
+]
